@@ -37,7 +37,7 @@
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 .container {  
   width: 100%;
-  max-width: 425px;
+  max-width: 400px;
   margin: 0 auto;
   padding: 0 10px;
   box-sizing: border-box; }
@@ -172,8 +172,8 @@ html {
   font-size: 62.5%; }
 
 body {
-  background-image: url("/assets/method_of_loci.png");
-  background-size: cover x;
+  background-image: url("/assets/images/method_of_loci-1000w.png");
+  background-size: cover;
   background-repeat: repeat;
   font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
   line-height: 1.6;
@@ -436,7 +436,6 @@ near the relevant code. For example, if you wanted to change the styles for butt
 on small devices, paste the mobile query code up in the buttons section and style it
 there.
 */
-
 
 /* Larger than mobile */
 @media (min-width: 400px) {}
