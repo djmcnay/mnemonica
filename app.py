@@ -24,6 +24,7 @@ import dash_daq as daq
 # Initialise app object
 # Note that we use an internal CSS stylesheet so no external CSS is added
 app = dash.Dash('Mnemonica')
+app.title='Mnemonica Trainer'
 server = app.server
     
 # Image Directory
