@@ -130,6 +130,9 @@ app.layout = html.Div([
                               'stack':'tamariz',  # default stack
                               'pTypeRadio':99,    # triggers auto load of problem
                               }),
+    
+    html.Datalist(id='datalist',
+                  children=['Ace of Spades']),
         
     ### HEADER & RANDOM CHAT
     html.H2('Mnemonica Trainer', style={'margin-bottom':'5px',
@@ -155,12 +158,13 @@ app.layout = html.Div([
                     
                 # Play Button
                 html.Button(id='button', children='RELOAD'),
-                                                
+                
                 # Solution Box
                 dcc.Input(id='solution',
                           type='text',
                           placeholder='Answer...',
                           autoComplete='off',
+                          maxLength=3,
                           debounce=False,
                           style={'height':'100%',
                                  'width':'60%',
@@ -427,8 +431,7 @@ def mega_callback(n_clicks, n_submit, pType, stack,
         if RESULT:
             log['wins'] += 1
             result_text= 'CORRECT'
-            prob, prob_update = _problem_setup(pd.DataFrame(stack), pType), True
-            soln = ''            
+            prob, prob_update = _problem_setup(pd.DataFrame(stack), pType), True           
             if gifs: 
                 gif = random.choice(gif_wins)
         else:
@@ -436,7 +439,8 @@ def mega_callback(n_clicks, n_submit, pType, stack,
             if gifs:
                 gif = random.choice(gif_loss)
             
-        # Update GIF Stylesheet stuff
+        # Update GIF Stylesheet stuff & reset solution
+        soln = '' 
         gif_style = {'display':'inline-block', 'max-width':'100%'}
     
     # Update Problem Images/Index Question
@@ -473,4 +477,4 @@ def mega_callback(n_clicks, n_submit, pType, stack,
 # %% RUN APP
       
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server()
