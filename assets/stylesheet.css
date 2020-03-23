@@ -36,8 +36,6 @@
 /* Grid
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 .container {  
-  width: 100%;
-  max-width: 400px;
   margin: 0 auto;
   padding: 0 10px;
   box-sizing: border-box; }
@@ -47,17 +45,22 @@
   float: left;
   box-sizing: border-box; }
 
-/* For devices larger than 400px */
+
+/* DEFAULTS FOR SMALLER SCREENS
+For devices larger than 400px */
 @media (min-width: 400px) {
   .container {
-    width: 85%;
-    padding: 0; }
+    width: 90%;
+    max-width: 800px;
+    padding: 0;}
 }
 
-/* For devices larger than 550px */
-@media (min-width: 550px) {
+/* For devices larger than 1000px - so proper monitors */
+@media (min-width: 1000px) {
   .container {
-    width: 80%; }
+    width: 80%;
+    max-width: 400px;
+    }
   .column,
   .columns {
     margin-left: 4%; }
@@ -151,7 +154,8 @@
 }
 
 .tab-div-custom {
-    min-height: 250px;
+    min-height: 500px;
+    max-height: 1000px;
 }
 
 /* div container here for any divs we want to pop outside the main tab
@@ -426,7 +430,6 @@ hr {
   content: "";
   display: table;
   clear: both; }
-
 
 /* Media Queries
 –––––––––––––––––––––––––––––––––––––––––––––––––– */

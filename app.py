@@ -6,7 +6,13 @@ Built as a training toy to better understand how to use Dash-by-Plotly, as well
 as to reinforce my 'loci' or 'memory palace' for the Tamariz Mnemonic Stack.
 
 This first version allows the user to select between the 'card' or 'position'
-within the stack. """
+within the stack. 
+
+Things still to fix:
+    1. have stacks loaded as JSON files
+    2. similar GIFs as JSON files
+    3. random gif sequence based on hastag
+    4. update layout"""
 # %% DEPENDENCIES & DASH SET UP
 
 import pandas as pd
@@ -138,6 +144,7 @@ app.layout = html.Div([
     html.H2('Mnemonica Trainer', style={'margin-bottom':'5px',
                                         'text-align':'center'}),
     
+    # %% 
     ### Master Tabs
     dcc.Tabs(id='tabs_master',
              parent_className='custom-tabs',
@@ -150,65 +157,70 @@ app.layout = html.Div([
                 selected_className='custom-tab--selected',
                 label='MAIN',
                 children=[
+            
+            # MAIN DIV - Only really exists for CSS
+            html.Div([
+                
+                ## GAMEPLAY Div
+                # Contains the Refresh button (new problem) & answer box
+                # In due course this could have a 'hint' button as well
+                html.Div([
                         
-            ## GAMEPLAY Div
-            # Contains the Refresh button (new problem) & answer box
-            # In due course this could have a 'hint' button as well
-            html.Div([
+                    # Play Button
+                    html.Button(id='button', children='RELOAD'),
                     
-                # Play Button
-                html.Button(id='button', children='RELOAD'),
-                
-                # Solution Box
-                dcc.Input(id='solution',
-                          type='text',
-                          placeholder='Answer...',
-                          autoComplete='off',
-                          maxLength=3,
-                          debounce=False,
-                          style={'height':'100%',
-                                 'width':'60%',
-                                 'margin-left':'5%',
-                                 'text-align':'center'}),
-     
-            ], style={'display':'block',
-                      'width':'90%',
-                      'margin-left':'5%',
-                      'margin-top':'15px'}),    # End of Gameplay Div
-   
-            ## PROBLEM DIV
-            # Here we have a No (position index) & Image of a card
-            # No styling on either, because the 'style' gets updated in a callback
-            html.Div([
-
-                html.P(id='problem_number', children=''),
-                html.Img(id='image_card'), 
+                    # Solution Box
+                    dcc.Input(id='solution',
+                              type='text',
+                              placeholder='Answer...',
+                              autoComplete='off',
+                              maxLength=3,
+                              debounce=True,
+                              style={'height':'200%',
+                                     'width':'60%',
+                                     'margin-left':'5%',
+                                     'text-align':'justify'}),
+         
+                ], style={'display':'block',
+                          'width':'90%',
+                          'margin-left':'5%',
+                          'margin-top':'10px',
+                          'margin-bottom':'5px' }),    # End of Gameplay Div
+       
+                ## PROBLEM DIV
+                # Here we have a No (position index) & Image of a card
+                # No styling on either, because the 'style' gets updated in a callback
+                html.Div([
     
-            ], id='div_problem',
-               style={'height':'175px',
-                      'font-size':100,
-                      'font-weight':'boldest',
-                      'text-align':'center',
-                      'padding-top':'25px'}),    # END of Problem Div
+                    html.P(id='problem_number', children=''),
+                    html.Img(id='image_card'), 
+        
+                ], id='div_problem',
+                   style={'height':'175px',
+                          'font-size':100,
+                          'font-weight':'boldest',
+                          'text-align':'center',
+                          'margin-top':'10px'}),    # END of Problem Div
+        
+                ## RESULTS
+                # Text with written correct or incorrect
+                # Rolling score i.e. 50% correct from 10 attempts
+                # GIFs - could be removed in future versions
+                html.Div([
+                    
+                    html.Div(id='solution_written'),
+                    html.Div(id='rolling_score'),
+                    
+                    # Silly little Gif Thing - could easily be deleted or simplifed
+                    # uses 2 lists of gifs defined elsewhere for win/loss gifs
+                    html.Img(id='image_result', src='',),
+                    
+                ], style={'text-align':'center',}),    # END Results Div
     
-            ## RESULTS
-            # Text with written correct or incorrect
-            # Rolling score i.e. 50% correct from 10 attempts
-            # GIFs - could be removed in future versions
-            html.Div([
-                
-                html.Div(id='solution_written'),
-                html.Div(id='rolling_score'),
-                
-                # Silly little Gif Thing - could easily be deleted or simplifed
-                # uses 2 lists of gifs defined elsewhere for win/loss gifs
-                html.Img(id='image_result', src='',),
-                
-            ], style={'text-align':'center',}),    # END Results Div
-    
-    
+            ], className='tab-div-custom', ), # END of MAIN Div
         ]), # END of MAIN tab
     
+        # %%
         ### STACK TABLE TAB
         dcc.Tab(id='tabs_stack',
                 label='STACK',
@@ -222,7 +234,7 @@ app.layout = html.Div([
                 dt.DataTable(
                     id='stack_table',
                     columns=[{'name':i, 'id':i} for i in df_dummy.columns],
-                    style_table={'maxHeight': '500px',    # 500px is my google browser
+                    style_table={'maxHeight': '600px',    # 500px is my google browser
                                  'overflowY': 'scroll'},
                     style_as_list_view=True,
                     style_cell_conditional=[
@@ -237,6 +249,7 @@ app.layout = html.Div([
             ], className='tab-div-custom',),
         ]), # END of STACK tab
     
+        # %%
         ### SETUP TAB
         dcc.Tab(id='tabs_setup',
                 label='SETUP',
@@ -271,7 +284,7 @@ app.layout = html.Div([
                 html.Div([
                     daq.BooleanSwitch(id='switch_gifs', 
                                       label='Display Silly GIFs:',
-                                      on=False, color='BURLYWOOD',),
+                                      on=True, color='BURLYWOOD',),
                 ], style={'padding-left':'2%',
                           'width':'40%'}),
 
@@ -279,17 +292,19 @@ app.layout = html.Div([
         
         ]), # END of SETUP TAB
         
+        # %%
         ### NOTES TAB
         dcc.Tab(id='tab_notes',
                 label='NOTES',
                 className='custom-tab',
                 selected_className='custom-tab--selected',
                 children=[dcc.Markdown(md_about,
+                                       className='tab-div-custom',
                                        style={'margin':'2%',
                                               'font-size':'13px',
-                                              'text-align':'justify'})])                     
-                
+                                              'text-align':'justify',},)],)                     
     
+    # %%
     ]), # END of Master TABS
     
     dcc.Markdown('a Pontificating Panda Plaything from 2020',
@@ -452,7 +467,7 @@ def mega_callback(n_clicks, n_submit, pType, stack,
     # adjust style hidden/inline depnding on if we are solving card/position
     # would be more efficeint to do this only if required!!!
     if prob['type'] == 1:
-        cardStyle = {'display':'inline-block', 'height':'150px'}
+        cardStyle = {'display':'inline-block', 'height':'175px'}
         posnStyle = {'display':'none'}
     else:
         cardStyle = {'display': 'none'}
