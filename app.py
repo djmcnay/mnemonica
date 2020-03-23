@@ -9,15 +9,17 @@ This first version allows the user to select between the 'card' or 'position'
 within the stack. 
 
 Things still to fix:
-    1. have stacks loaded as JSON files
-    2. similar GIFs as JSON files
-    3. random gif sequence based on hastag
-    4. update layout"""
+    - write images profiles for each loci
+    - random gif sequence based on hastag
+    - update layout
+    - make image overwrite saveable to json
+    - hint box
+    """
 # %% DEPENDENCIES & DASH SET UP
 
 import pandas as pd
 import random
-import math
+import json
 
 # Dash & Plotly
 import dash
@@ -33,72 +35,23 @@ app = dash.Dash('Mnemonica')
 app.title='Mnemonica'
 server = app.server
     
-# Image Directory
-# Totally unnecessary & better of as a dictionary in future
-# Should also have an option to skip this
-gif_wins = ['https://media.giphy.com/media/WrBSHRLE9gEgM/giphy.gif',
-            'https://media.giphy.com/media/50i6YRZxEiqkM/giphy.gif',
-            'https://media.giphy.com/media/aUhEBE0T8XNHa/giphy.gif',
-            'https://media.giphy.com/media/txsJLp7Z8zAic/giphy.gif',
-            'https://media.giphy.com/media/tGbhyv8Wmi4EM/giphy.gif',
-            'https://media.giphy.com/media/50cjS4l1tm8ne/giphy.gif',
-            'https://media.giphy.com/media/e3ju7ALSHtJmM/giphy.gif',
-            'https://media.giphy.com/media/13746CZnj9zQwo/giphy.gif',
-            'https://media.giphy.com/media/pYRYdnMICWmti/giphy.gif',
-            'https://media.giphy.com/media/xuMu0HuHlXiQ8/giphy.gif',
-            'https://media.giphy.com/media/nZvxbksUffPUI/giphy.gif',
-            'https://media.giphy.com/media/22ZVpCkODW36w/giphy.gif',
-            'https://media.giphy.com/media/l2JhuG3G56WPngPK0/giphy.gif',
-            'https://media.giphy.com/media/sVpr5Bdi9Rhm0/giphy.gif',
-            'https://media.giphy.com/media/Xw6yFn7frR3Y4/giphy.gif',
-            'https://media.giphy.com/media/d1vaWA1lsbIdy/giphy.gif',
-            ]
+# GIF Image direectory
+# Imported as a JSON file (look at the jsoning.py file)
+gifs = json.load(open('assets/json_gifs', 'r'))
+gif_wins = [i['link'] for i in gifs['boobs']]+[i['link'] for i in gifs['strong']]
+gif_loss = [i['link'] for i  in gifs['lose']]
 
-gif_loss = ['https://media.giphy.com/media/jrmB4IURyv2ik/giphy.gif',
-            'https://media.giphy.com/media/Qc8GJi3L3Jqko/giphy.gif',
-            'https://media.giphy.com/media/fthYZQx5c7hiU/giphy.gif',
-            'https://media.giphy.com/media/EPcvhM28ER9XW/giphy.gif',
-            'https://media.giphy.com/media/vO4ik3XWjkQ2A/giphy.gif']
-
-# %% MNEMONIC SPECIFICS
-
-### Dictionaries
+# Dictionaries
 # Really just to assist in converting shorthand i.e. AS to Ace of Spades
-suits = {'C':'Clubs',
-         'H':'Hearts',
-         'D':'Diamonds',
-         'S':'Spades'}
-
+suits = {'C':'Clubs', 'H':'Hearts', 'D':'Diamonds', 'S':'Spades'}
 values = {'2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, '10':10,
           'J':'Jack','Q':'Queen','K':'King', 'A':'Ace'}
 
-### Functions
-def stack2df(stack='tamariz'):
-    """ Converts a named stack or list into a pd.DataFrame """
-    
-    # Tamariz Mnemonic Stack
-    tms = ['4C','2H','7D','3C','4H','6D','AS','5H','9S','2S','QH','3D', 'QC','8H',
-           '6S','5S','9H','KC','2D','JH', '3S','8S','6H','10C','5D','KD','2C','3H',
-           '8D','5C', 'KS','JD','8C','10S','KH','JC','7S','10H','AD','4S', '7H','4D',
-           'AC','9C','JS','QD','7C','QS','10D','6C', 'AH', '9D']
-    
-    # Aaronson Stack
-    ars = ['JS','KC','5C','2H','9S','AS','3H','6C','8D','AC','10S','5H','2D',
-           'KD','7D','8C','3S','AD','7S','5S','QD','AH','8S','3D','7H','QH',
-           '5D','7C','4H','KH','4D','10D','JC','JH','10C','JD','4S','10H','6H',
-           '3C','2S','9H','KS','6S','4C','8H','9C','QS','6D','QC','2C','9D']
+### Stacks are saved in a JSON file
+# Currently to edit a stack you need to edit jsoning.py & run that script
+stacks = json.load(open('assets/json_stacks', 'r'))
+tamariz= pd.DataFrame(stacks['tamariz'], columns=['posn','card','loci','image'])
 
-    if stack == 'tamariz':
-        x = tms 
-    elif stack == 'aronson':
-        x = ars
-    
-    idx = list(range(1, len(x)+1))
-    return pd.DataFrame(list(zip(idx, x, [math.ceil((i/2)) for i in idx])),
-                        columns=['index', 'card', 'loci',])
-
-df_dummy = stack2df('tamariz')  
-    
 # %% MARKDOWN BLOCKS
 
 # Note we use a hack with CSS to centralise the image!
@@ -128,7 +81,7 @@ app.layout = html.Div([
     ### MEMORY STORE - dash reequires this inside the layout
     # These don't show up on the web app
     # Can live outside the Tabs
-    dcc.Store(id='stack_store', data=df_dummy.to_dict()),
+    dcc.Store(id='stack_store', data=tamariz.to_dict()),
     dcc.Store(id='problem_data', data={'posn':0, 'type':0}),
     dcc.Store(id='log', data={'n_clicks':0,
                               'n_submits':0,
@@ -183,7 +136,7 @@ app.layout = html.Div([
          
                 ], style={'display':'block',
                           'width':'90%',
-                          'margin-left':'5%',
+                          'margin-left':'5%',   
                           'margin-top':'10px',
                           'margin-bottom':'5px' }),    # End of Gameplay Div
        
@@ -233,14 +186,15 @@ app.layout = html.Div([
                 # These seem really easy till you style the f*ckers
                 dt.DataTable(
                     id='stack_table',
-                    columns=[{'name':i, 'id':i} for i in df_dummy.columns],
+                    columns=[{'name':i, 'id':i} for i in tamariz.columns],
                     style_table={'maxHeight': '600px',    # 500px is my google browser
                                  'overflowY': 'scroll'},
                     style_as_list_view=True,
                     style_cell_conditional=[
-                        {'if':{'column_id':'index'}, 'text-align':'center'},
-                        {'if':{'column_id':'card'}, 'text-align':'center'},
-                        {'if':{'column_id':'loci'}, 'text-align':'center'}],
+                        {'if':{'column_id':'posn'}, 'text-align':'center', 'width':'15%'},
+                        {'if':{'column_id':'card'}, 'text-align':'center', 'width':'15%'},
+                        {'if':{'column_id':'loci'}, 'text-align':'center', 'width':'15%'},
+                        {'if':{'column_id':'image'}, 'text-align':'center'}],
                     style_data_conditional=[
                         {'if':{'row_index':'odd'}, 'backgroundColor': 'floralwhite'}],
                     style_header={'backgroundColor': 'burlywood',
@@ -272,7 +226,7 @@ app.layout = html.Div([
                 # Type of Question
                 dcc.Markdown('Test yourself by:', style={'padding-left':'2%'}),
                 dcc.RadioItems(id='radio_type',
-                               options=[{'label':'index ','value':0},
+                               options=[{'label':'posn ','value':0},
                                         {'label':'card  ','value':1},
                                         {'label':'both  ','value':2}],
                                    value=1,
@@ -335,7 +289,8 @@ app.layout = html.Div([
                dd.Output('stack_table', 'data')],
               [dd.Input('dropdown_stack', 'value')])
 def stack2store(stack):
-    df = stack2df(stack=stack)      
+    #df = stack2df(stack=stack)    
+    df = pd.DataFrame(stacks[stack], columns=['posn', 'card', 'loci', 'image'])
     return df.to_dict(), df.to_dict('records')
 
 ### MEGA-CALLBACK OF DOOM
