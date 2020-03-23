@@ -18,6 +18,7 @@ Things still to fix:
 import pandas as pd
 import random
 import math
+import json
 
 # Dash & Plotly
 import dash
@@ -33,32 +34,11 @@ app = dash.Dash('Mnemonica')
 app.title='Mnemonica'
 server = app.server
     
-# Image Directory
-# Totally unnecessary & better of as a dictionary in future
-# Should also have an option to skip this
-gif_wins = ['https://media.giphy.com/media/WrBSHRLE9gEgM/giphy.gif',
-            'https://media.giphy.com/media/50i6YRZxEiqkM/giphy.gif',
-            'https://media.giphy.com/media/aUhEBE0T8XNHa/giphy.gif',
-            'https://media.giphy.com/media/txsJLp7Z8zAic/giphy.gif',
-            'https://media.giphy.com/media/tGbhyv8Wmi4EM/giphy.gif',
-            'https://media.giphy.com/media/50cjS4l1tm8ne/giphy.gif',
-            'https://media.giphy.com/media/e3ju7ALSHtJmM/giphy.gif',
-            'https://media.giphy.com/media/13746CZnj9zQwo/giphy.gif',
-            'https://media.giphy.com/media/pYRYdnMICWmti/giphy.gif',
-            'https://media.giphy.com/media/xuMu0HuHlXiQ8/giphy.gif',
-            'https://media.giphy.com/media/nZvxbksUffPUI/giphy.gif',
-            'https://media.giphy.com/media/22ZVpCkODW36w/giphy.gif',
-            'https://media.giphy.com/media/l2JhuG3G56WPngPK0/giphy.gif',
-            'https://media.giphy.com/media/sVpr5Bdi9Rhm0/giphy.gif',
-            'https://media.giphy.com/media/Xw6yFn7frR3Y4/giphy.gif',
-            'https://media.giphy.com/media/d1vaWA1lsbIdy/giphy.gif',
-            ]
-
-gif_loss = ['https://media.giphy.com/media/jrmB4IURyv2ik/giphy.gif',
-            'https://media.giphy.com/media/Qc8GJi3L3Jqko/giphy.gif',
-            'https://media.giphy.com/media/fthYZQx5c7hiU/giphy.gif',
-            'https://media.giphy.com/media/EPcvhM28ER9XW/giphy.gif',
-            'https://media.giphy.com/media/vO4ik3XWjkQ2A/giphy.gif']
+# GIF Image direectory
+# Imported as a JSON file (look at the jsoning.py file)
+gifs = json.load(open('json_gifs', 'r'))
+gif_wins = [i['link'] for i in gifs['boobs']]+[i['link'] for i in gifs['strong']]
+gif_loses = [i['link'] for i  in gifs['lose']]
 
 # %% MNEMONIC SPECIFICS
 
@@ -492,4 +472,4 @@ def mega_callback(n_clicks, n_submit, pType, stack,
 # %% RUN APP
       
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)
