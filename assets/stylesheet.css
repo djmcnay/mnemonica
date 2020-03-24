@@ -37,7 +37,7 @@
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 .container {  
   margin: 0 auto;
-  padding: 0 10px;
+  padding: 0 5px;
   box-sizing: border-box; }
 .column,
 .columns {
@@ -59,7 +59,7 @@ For devices larger than 400px */
 @media (min-width: 1000px) {
   .container {
     width: 80%;
-    max-width: 400px;
+    max-width: 450px;
     }
   .column,
   .columns {
@@ -117,6 +117,19 @@ For devices larger than 400px */
   .offset-by-one-half.column,
   .offset-by-one-half.columns     { margin-left: 52%; }
 }
+
+
+/* Custom Divss */
+.custom-play-div {
+    background: green;
+    
+    .column {
+        float: left;
+        width: 50%;
+    }
+}
+
+
 
 /* Tabs */
 
@@ -246,8 +259,8 @@ input[type="submit"],
 input[type="reset"],
 input[type="button"] {
   display: inline-block;
-  height: 38px;
-  padding: 0 30px;
+  height: 40px;
+  padding: 10 10px;
   color: grey;
   text-align: justify;
   font-size: 11px;
@@ -258,7 +271,7 @@ input[type="button"] {
   text-decoration: none;
   white-space: nowrap;
   background-color: antiquewhite;
-  border-radius: 5px;
+  border-radius: 8px;
   border: 1px solid #bbb;
   cursor: pointer;
   box-sizing: border-box; }
