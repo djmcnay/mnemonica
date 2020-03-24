@@ -96,14 +96,14 @@ app.layout = html.Div([
     ### HEADER & RANDOM CHAT
     html.H2('Mnemonica Trainer', style={'margin-bottom':'5px',
                                         'text-align':'center'}),
-    
-    # %% 
+
     ### Master Tabs
     dcc.Tabs(id='tabs_master',
              parent_className='custom-tabs',
              className='custom-tabs-container',
              children=[
-    
+                     
+        # %% 
         ### MAIN TAB
         dcc.Tab(id='tabs_main',
                 className='custom-tab',
@@ -114,14 +114,16 @@ app.layout = html.Div([
             # MAIN DIV - Only really exists for CSS
             html.Div([
                 
-                ## GAMEPLAY Div
-                # Contains the Refresh button (new problem) & answer box
-                # In due course this could have a 'hint' button as well
                 html.Div([
-                        
-                    # Play Button
-                    html.Button(id='button', children='RELOAD'),
-                    
+
+                    # reload button
+                    html.Button(id='button', children='RELOAD', 
+                                style={'display':'inline-block',
+                                       'width':'25%',
+                                       'margin-left':'5%',
+                                       'text-align':'center',
+                                       'height':'50px',}),
+    
                     # Solution Box
                     dcc.Input(id='solution',
                               type='text',
@@ -129,32 +131,30 @@ app.layout = html.Div([
                               autoComplete='off',
                               maxLength=3,
                               debounce=True,
-                              style={'height':'200%',
+                              style={'display':'inline-block',
                                      'width':'60%',
-                                     'margin-left':'5%',
+                                     'height':'52px',
+                                     'margin-left':'2.5%',
                                      'text-align':'justify'}),
-         
-                ], style={'display':'block',
-                          'width':'90%',
-                          'margin-left':'5%',   
-                          'margin-top':'10px',
-                          'margin-bottom':'5px' }),    # End of Gameplay Div
-       
+                        
+                ], style={'width':'100%',
+                          'padding-top':'10px',
+                          'padding-bottom':'10px',
+                          'display':'inline-block',
+                          #'border':'1px solid blue',
+                            }),
+                
                 ## PROBLEM DIV
-                # Here we have a No (position index) & Image of a card
-                # No styling on either, because the 'style' gets updated in a callback
                 html.Div([
-    
-                    html.P(id='problem_number', children=''),
-                    html.Img(id='image_card'), 
-        
-                ], id='div_problem',
-                   style={'height':'175px',
-                          'font-size':100,
-                          'font-weight':'boldest',
+                    html.Img(id='image_card', style={'maxHeight':'100%',
+                                                     'display':'inline-block',}),
+                ], style={'width':'100%',
+                          'height':'325px',
                           'text-align':'center',
-                          'margin-top':'10px'}),    # END of Problem Div
-        
+                          'display':'inline-block',
+                          #'border':'1px solid green',
+                            }),  # END of Problem Div
+                        
                 ## RESULTS
                 # Text with written correct or incorrect
                 # Rolling score i.e. 50% correct from 10 attempts
@@ -168,7 +168,9 @@ app.layout = html.Div([
                     # uses 2 lists of gifs defined elsewhere for win/loss gifs
                     html.Img(id='image_result', src='',),
                     
-                ], style={'text-align':'center',}),    # END Results Div
+                ], style={'text-align':'center',
+                          #'border':'1px solid pink',
+                          'display':'block'}),    # END Results Div
     
             ], className='tab-div-custom', ), # END of MAIN Div
         ]), # END of MAIN tab
@@ -314,9 +316,6 @@ def _problem_setup(df, pType):
 @app.callback([dd.Output('problem_data', 'data'),
                dd.Output('log', 'data'),
                dd.Output('image_card', 'src'),
-               dd.Output('problem_number', 'children'),
-               dd.Output('image_card', 'style'),
-               dd.Output('problem_number', 'style'),
                dd.Output('solution_written', 'children'),
                dd.Output('solution', 'value'),
                dd.Output('image_result', 'src'),
@@ -352,10 +351,10 @@ def mega_callback(n_clicks, n_submit, pType, stack,
     
     # Dummy Outputs - used if not updated during callback
     soln = "" if soln == None else soln
-    prob_update = False    # have we updated the problem yet?
     result_text = "..."
     gif, gif_style = '', {'display':'none'}
     HIDDEN_STR= ""
+    img_src = app.get_asset_url('numbers/52.png')
     
     
     ### PROBLEM UPDATING
@@ -370,15 +369,15 @@ def mega_callback(n_clicks, n_submit, pType, stack,
     # ACTION: Make more efficeint in the future 
     if log['pTypeRadio'] != pType:
         log['pTypeRadio'] = pType
-        prob, prob_update = _problem_setup(pd.DataFrame(stack), pType), True 
+        prob = _problem_setup(pd.DataFrame(stack), pType)
         
     if log['stack'] != stack_dropdown:
         log['stack'] = stack_dropdown
-        prob, prob_update = _problem_setup(pd.DataFrame(stack), pType), True
+        prob = _problem_setup(pd.DataFrame(stack), pType)
         
     if  n_clicks == log['n_clicks']+1:
         log['n_clicks'] += 1
-        prob, prob_update = _problem_setup(pd.DataFrame(stack), pType), True
+        prob = _problem_setup(pd.DataFrame(stack), pType)
         
     ### SOLUTIONS TESTING
     if n_submit == log['n_submits'] + 1:
@@ -401,7 +400,7 @@ def mega_callback(n_clicks, n_submit, pType, stack,
         if RESULT:
             log['wins'] += 1
             result_text= 'CORRECT'
-            prob, prob_update = _problem_setup(pd.DataFrame(stack), pType), True           
+            prob = _problem_setup(pd.DataFrame(stack), pType)           
             if gifs: 
                 gif = random.choice(gif_wins)
         else:
@@ -413,22 +412,14 @@ def mega_callback(n_clicks, n_submit, pType, stack,
         soln = '' 
         gif_style = {'display':'inline-block', 'max-width':'100%'}
     
-    # Update Problem Images/Index Question
-    if prob_update == True:
+    ### Update Problem Images/Index Question
+    if prob['type'] == 1: 
         ref = 'cards/'+prob['card']+'.png'    # directory of selected card
-        img_src = app.get_asset_url(ref)
-    
-    ### FORMATTING & STYLING
-    # adjust style hidden/inline depnding on if we are solving card/position
-    # would be more efficeint to do this only if required!!!
-    if prob['type'] == 1:
-        cardStyle = {'display':'inline-block', 'height':'175px'}
-        posnStyle = {'display':'none'}
     else:
-        cardStyle = {'display': 'none'}
-        posnStyle = {'display':'inline-block', 'align':'center', 'width':'100%'}
-    
-    
+        ref = 'numbers/'+str(prob['posn'])+'.png'            
+    img_src = app.get_asset_url(ref)
+
+        
     ### ROLLING SCORE
     if log['n_submits'] == 0:
         rolling_score = ''
@@ -440,8 +431,7 @@ def mega_callback(n_clicks, n_submit, pType, stack,
      ### OTHER ADMIN
     HIDDEN_STR = str(prob)+str(log)+str(pType)
     
-    return (prob, log, img_src, prob['posn'], cardStyle,
-            posnStyle,result_text, soln,
+    return (prob, log, img_src, result_text, soln,
             gif, gif_style, rolling_score, HIDDEN_STR)
 
 # %% RUN APP

@@ -149,7 +149,7 @@ app.layout = html.Div([
                     html.Img(id='image_card', style={'maxHeight':'100%',
                                                      'display':'inline-block',}),
                 ], style={'width':'100%',
-                          'height':'350px',
+                          'height':'325px',
                           'text-align':'center',
                           'display':'inline-block',
                           #'border':'1px solid green',
