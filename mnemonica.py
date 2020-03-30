@@ -457,4 +457,4 @@ def mega_callback(n_clicks, n_submit, pType, stack,
 # %% RUN APP
       
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)
