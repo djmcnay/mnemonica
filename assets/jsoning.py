@@ -191,7 +191,7 @@ stacks = {
 }
 
 # SAVE STACKS   
-json.dump(stacks, open('./assets/json_stacks', 'w'))
+json.dump(stacks, open('json_stacks', 'w'))
 
 # %% GIFS
 
@@ -293,4 +293,4 @@ gifs = {
 }
       
 # SAVE GIFS
-json.dump(gifs, open('./assets/json_gifs', 'w'))
+json.dump(gifs, open('json_gifs', 'w'))
