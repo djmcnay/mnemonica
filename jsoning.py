@@ -14,9 +14,6 @@ to store those in a seperate file than in cluttering the main app interface.
 # %%
 
 import json
-import pandas as pd
-import math
-
 
 # %% STACKS
 

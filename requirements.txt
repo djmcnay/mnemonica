@@ -9,6 +9,7 @@ dash-renderer==1.0.0
 dash-table==4.1.0
 dask==2.1.0
 dash_daq==0.4.0
+json
 decorator==4.4.0
 Flask==1.1.1
 Flask-Compress==1.4.0
