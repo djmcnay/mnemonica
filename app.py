@@ -103,8 +103,7 @@ app.layout = html.Div([
              className='custom-tabs-container',
              children=[
                      
-        # %% 
-        ### MAIN TAB
+        # %%  ### MAIN TAB
         dcc.Tab(id='tabs_main',
                 className='custom-tab',
                 selected_className='custom-tab--selected',
@@ -175,8 +174,7 @@ app.layout = html.Div([
             ], className='tab-div-custom', ), # END of MAIN Div
         ]), # END of MAIN tab
     
-        # %%
-        ### STACK TABLE TAB
+        # %% ### STACK TABLE TAB
         dcc.Tab(id='tabs_stack',
                 label='STACK',
                 className='custom-tab',
@@ -205,8 +203,7 @@ app.layout = html.Div([
             ], className='tab-div-custom',),
         ]), # END of STACK tab
     
-        # %%
-        ### SETUP TAB
+        # %% ### SETUP TAB
         dcc.Tab(id='tabs_setup',
                 label='SETUP',
                 className='custom-tab',
@@ -248,8 +245,7 @@ app.layout = html.Div([
         
         ]), # END of SETUP TAB
         
-        # %%
-        ### NOTES TAB
+        # %% ### NOTES TAB
         dcc.Tab(id='tab_notes',
                 label='NOTES',
                 className='custom-tab',
@@ -269,7 +265,7 @@ app.layout = html.Div([
     # HIDDEN IN PRODUCTION
     html.Div(id='HIDDEN_DIV', 
              className='markdown-outside-tabs',
-             style={'display':'none', 'font-size':'15px', 'margin-top':'100px'})  
+             style={'display':'inline-block', 'font-size':'15px', 'margin-top':'100px'})  
 
 # end master Layout
 # styling of master-layout done withing 'container' in the CSS file
