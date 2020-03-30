@@ -20,6 +20,7 @@ Things still to fix:
 import pandas as pd
 import random
 import json
+import requests
 
 # Dash & Plotly
 import dash
@@ -38,8 +39,30 @@ server = app.server
 # GIF Image direectory
 # Imported as a JSON file (look at the jsoning.py file)
 gifs = json.load(open('assets/json_gifs', 'r'))
-gif_wins = [i['link'] for i in gifs['boobs']]+[i['link'] for i in gifs['strong']]
-gif_loss = [i['link'] for i  in gifs['lose']]
+gif_wins, gif_loss = [], []
+
+
+gif_wins.extend([i['link'] for i in gifs['boobs']]+[i['link'] for i in gifs['strong']])
+gif_loss.extend([i['link'] for i  in gifs['lose']])
+
+# because I'm an overgrown child, lets add some random hashtags to the gifs
+def giphy(hashtag=['boobs', 'sexy'], limit=25, rating=""):
+    
+    data_list = []
+    
+    for h in hashtag:
+        querystring = {"limit":limit, "q":h, "rating":rating, "api_key":"A9mWPStSmNIqnZQ8QHLLnPj9wR6ioi6u"}    
+        response = requests.request("GET", url="https://giphy.p.rapidapi.com/v1/gifs/search",
+                                    headers={'x-rapidapi-host':"giphy.p.rapidapi.com",
+                                             'x-rapidapi-key':"acc33661bemshee9e80b6508b83bp17261ejsn2ce1309f0c17"},
+                                    params=querystring)        
+        data_list.extend(json.loads(response.text)['data'])
+    
+    return ['https://media.giphy.com/media/'+i['id']+'/giphy.gif' for i in data_list]
+
+# extend with popular hastags
+gif_wins.extend(giphy(['sexy', 'amazing', 'epic', 'win', 'knockout', 'champion']))
+gif_loss.extend(giphy(['fail', 'slap']))
 
 # Dictionaries
 # Really just to assist in converting shorthand i.e. AS to Ace of Spades
@@ -265,7 +288,7 @@ app.layout = html.Div([
     # HIDDEN IN PRODUCTION
     html.Div(id='HIDDEN_DIV', 
              className='markdown-outside-tabs',
-             style={'display':'inline-block', 'font-size':'15px', 'margin-top':'100px'})  
+             style={'display':'none', 'font-size':'15px', 'margin-top':'100px'})  
 
 # end master Layout
 # styling of master-layout done withing 'container' in the CSS file
@@ -350,6 +373,7 @@ def mega_callback(n_clicks, n_submit, pType, stack,
     result_text = "..."
     gif, gif_style = '', {'display':'none'}
     HIDDEN_STR= ""
+    DEBUG_CODE= ""
     img_src = app.get_asset_url('numbers/52.png')
     
     
@@ -425,7 +449,7 @@ def mega_callback(n_clicks, n_submit, pType, stack,
     
     
      ### OTHER ADMIN
-    HIDDEN_STR = str(prob)+str(log)+str(pType)
+    HIDDEN_STR = str(prob)+str(log)+str(pType)+DEBUG_CODE
     
     return (prob, log, img_src, result_text, soln,
             gif, gif_style, rolling_score, HIDDEN_STR)
@@ -433,4 +457,4 @@ def mega_callback(n_clicks, n_submit, pType, stack,
 # %% RUN APP
       
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)
