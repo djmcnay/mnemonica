@@ -61,7 +61,7 @@ def giphy(hashtag=['boobs', 'sexy'], limit=25, rating=""):
 
 # extend with popular hastags
 gif_wins.extend(giphy(['sexy', 'amazing', 'epic', 'win', 'knockout', 'champion',
-                       'strong', 'boobs', 'tits', 'boom']))
+                       'strong', 'lingerie', 'tits', 'boom', 'flex', 'red panda']))
 gif_loss.extend(giphy(['fail', 'slap', 'no']))
 
 # Dictionaries
