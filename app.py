@@ -41,7 +41,6 @@ server = app.server
 gifs = json.load(open('assets/json_gifs', 'r'))
 gif_wins, gif_loss = [], []
 
-
 gif_wins.extend([i['link'] for i in gifs['boobs']]+[i['link'] for i in gifs['strong']])
 gif_loss.extend([i['link'] for i  in gifs['lose']])
 
@@ -61,8 +60,9 @@ def giphy(hashtag=['boobs', 'sexy'], limit=25, rating=""):
     return ['https://media.giphy.com/media/'+i['id']+'/giphy.gif' for i in data_list]
 
 # extend with popular hastags
-gif_wins.extend(giphy(['sexy', 'amazing', 'epic', 'win', 'knockout', 'champion']))
-gif_loss.extend(giphy(['fail', 'slap']))
+gif_wins.extend(giphy(['sexy', 'amazing', 'epic', 'win', 'knockout', 'champion',
+                       'strong', 'boobs', 'tits', 'boom']))
+gif_loss.extend(giphy(['fail', 'slap', 'no']))
 
 # Dictionaries
 # Really just to assist in converting shorthand i.e. AS to Ace of Spades
