@@ -36,34 +36,6 @@ app = dash.Dash('Mnemonica')
 app.title='Mnemonica'
 server = app.server
     
-# GIF Image direectory
-# Imported as a JSON file (look at the jsoning.py file)
-gifs = json.load(open('assets/json_gifs', 'r'))
-gif_wins, gif_loss = [], []
-
-gif_wins.extend([i['link'] for i in gifs['boobs']]+[i['link'] for i in gifs['strong']])
-gif_loss.extend([i['link'] for i  in gifs['lose']])
-
-# because I'm an overgrown child, lets add some random hashtags to the gifs
-def giphy(hashtag=['boobs', 'sexy'], limit=25, rating=""):
-    
-    data_list = []
-    
-    for h in hashtag:
-        querystring = {"limit":limit, "q":h, "rating":rating, "api_key":"A9mWPStSmNIqnZQ8QHLLnPj9wR6ioi6u"}    
-        response = requests.request("GET", url="https://giphy.p.rapidapi.com/v1/gifs/search",
-                                    headers={'x-rapidapi-host':"giphy.p.rapidapi.com",
-                                             'x-rapidapi-key':"acc33661bemshee9e80b6508b83bp17261ejsn2ce1309f0c17"},
-                                    params=querystring)        
-        data_list.extend(json.loads(response.text)['data'])
-    
-    return ['https://media.giphy.com/media/'+i['id']+'/giphy.gif' for i in data_list]
-
-# extend with popular hastags
-gif_wins.extend(giphy(['sexy', 'amazing', 'epic', 'win', 'knockout', 'champion',
-                       'strong', 'lingerie', 'tits', 'boom', 'flex', 'red panda']))
-gif_loss.extend(giphy(['fail', 'slap', 'no']))
-
 # Dictionaries
 # Really just to assist in converting shorthand i.e. AS to Ace of Spades
 suits = {'C':'Clubs', 'H':'Hearts', 'D':'Diamonds', 'S':'Spades'}
@@ -75,6 +47,53 @@ values = {'2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, '10':10,
 stacks = json.load(open('assets/json_stacks', 'r'))
 tamariz= pd.DataFrame(stacks['tamariz'], columns=['posn','card','loci','image'])
 
+# %% Silly GIFs
+
+# dummy list of URLs
+gif_wins, gif_loss = [], []
+
+# Giphy search (via RestAPI)
+# because I'm an overgrown child, lets add some random hashtags to the gifs
+def giphy(hashtag=['boobs', 'sexy'], limit=25, rating="", data_list=[]):
+    
+    # NB/ API KEY is specific to mnemonica App
+    api_key= "A9mWPStSmNIqnZQ8QHLLnPj9wR6ioi6u"
+    
+    for h in hashtag:
+        querystring= {"limit":limit, "q":h, "rating":rating, "api_key":api_key}   
+        try:
+            response= requests.request("GET", params=querystring, 
+                                       url="https://giphy.p.rapidapi.com/v1/gifs/search",
+                                       headers={'x-rapidapi-host':"giphy.p.rapidapi.com",
+                                                'x-rapidapi-key':"acc33661bemshee9e80b6508b83bp17261ejsn2ce1309f0c17"},)        
+            data_list.extend(json.loads(response.text)['data'])
+        except:
+            continue
+    
+    # note on return we need the ID code in this format NOT the embed link
+    return ['https://media.giphy.com/media/'+i['id']+'/giphy.gif' for i in data_list]
+
+# personal directory imported as a JSON file (look at the jsoning.py file)
+gifs = json.load(open('assets/json_gifs', 'r'))
+gif_wins.extend([i['link'] for i in gifs['boobs']]+[i['link'] for i in gifs['strong']])
+gif_loss.extend([i['link'] for i  in gifs['lose']])
+
+# extend with popular hastags
+gif_wins.extend(giphy(['sexy',
+                       'amazing',
+                       'epic',
+                       'win',
+                       'knockout',
+                       'champion',
+                       'strong',
+                       'lingerie',
+                       'boom',
+                       'flex',
+                       'red panda']))
+gif_loss.extend(giphy(['fail',
+                       'slap',
+                       'no']))
+    
 # %% MARKDOWN BLOCKS
 
 # Note we use a hack with CSS to centralise the image!
