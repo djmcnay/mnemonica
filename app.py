@@ -55,6 +55,8 @@ gif_wins, gif_loss = [], []
 # Giphy search (via RestAPI)
 # because I'm an overgrown child, lets add some random hashtags to the gifs
 def giphy(hashtag=['boobs', 'sexy'], limit=25, rating="", data_list=[]):
+    # for full function look at my giphy script
+    # rapidAPI also very useful - https://rapidapi.com/giphy/api/giphy
     
     # NB/ API KEY is specific to mnemonica App
     api_key= "A9mWPStSmNIqnZQ8QHLLnPj9wR6ioi6u"
