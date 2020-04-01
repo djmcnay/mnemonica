@@ -59,7 +59,7 @@ For devices larger than 400px */
 @media (min-width: 1000px) {
   .container {
     width: 80%;
-    max-width: 450px;
+        max-width: 450px;
     }
   .column,
   .columns {

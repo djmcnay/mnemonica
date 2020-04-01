@@ -92,6 +92,7 @@ gif_wins.extend(giphy(['sexy',
                        'boom',
                        'flex',
                        'red panda']))
+    
 gif_loss.extend(giphy(['fail',
                        'slap',
                        'no']))
@@ -184,7 +185,6 @@ app.layout = html.Div([
                           'padding-top':'10px',
                           'padding-bottom':'10px',
                           'display':'inline-block',
-                          #'border':'1px solid blue',
                             }),
                 
                 ## PROBLEM DIV
@@ -195,7 +195,6 @@ app.layout = html.Div([
                           'height':'325px',
                           'text-align':'center',
                           'display':'inline-block',
-                          #'border':'1px solid green',
                             }),  # END of Problem Div
                         
                 ## RESULTS
@@ -212,7 +211,6 @@ app.layout = html.Div([
                     html.Img(id='image_result', src='',),
                     
                 ], style={'text-align':'center',
-                          #'border':'1px solid pink',
                           'display':'block'}),    # END Results Div
     
             ], className='tab-div-custom', ), # END of MAIN Div
@@ -309,7 +307,8 @@ app.layout = html.Div([
     # HIDDEN IN PRODUCTION
     html.Div(id='HIDDEN_DIV', 
              className='markdown-outside-tabs',
-             style={'display':'none', 'font-size':'15px', 'margin-top':'100px'})  
+             style={'display':'none',   #'border':'1px solid blue',
+                    'font-size':'15px', 'margin-top':'100px'})  
 
 # end master Layout
 # styling of master-layout done withing 'container' in the CSS file
