@@ -75,6 +75,10 @@ values = {'2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, '10':10,
 stacks = json.load(open('assets/json_stacks', 'r'))
 tamariz= pd.DataFrame(stacks['tamariz'], columns=['posn','card','loci','image'])
 
+### Dictionary of Loci
+loci = json.load(open('assets/json_loci', 'r'))
+loci = pd.DataFrame(loci['inandout'], columns=['posn', 'title', 'text']).set_index('posn')
+
 # %% MARKDOWN BLOCKS
 
 # Note we use a hack with CSS to centralise the image!
@@ -88,9 +92,10 @@ md_about = """
     
     ![The Memory Arts Book](assets/images/the-memory-arts1.jpeg#center)
     
-    The Trustman's convention is to place two-cards in each location, which is something 
-    I have followed in my own memory-palace. In the future I hope to add sketches of my 
-    each room in my memory palace... or maybe the world doesn't need that.
+    The Trustman's convention is to place two-cards in each location, which I found 
+    to be the simplest method of memorising the order of a deck, allowing interaction 
+    between cards at each loci. However, from my experience the downside is the 
+    requirement to do maths when converting loci to position numbers.
     
     App was developed by the Pontificating Panada using [Dash](https://plot.ly/dash/) 
     and the source code is available on [GitHub](https://github.com/djmcnay). I don't believe 
@@ -225,6 +230,43 @@ app.layout = html.Div([
                 ),
             ], className='tab-div-custom',),
         ]), # END of STACK tab
+                        
+        # %% ### Loci Tabl
+        
+        dcc.Tab(id='loci',
+                label='LOCI',
+                className='custom-tab',
+                selected_className='custom-tab--selected',
+                children=[
+            
+            # bar with current loci, forward & backwards
+            html.Div([html.Button(id='loci_backward', children='<', style={'display':'inline-block'}),
+                      html.Button(id='loci_forward', children='>', style={'display':'inline-block'}),
+                      
+                      dcc.Input(id='loci_ref', type='number', value=1, 
+                                min=1, max=52, debounce=True,
+                                style={'width':'55px',
+                                       'display':'inline-block',
+                                       'text-align':'left',
+                                       'margin-left':'5px',
+                                       'margin-right':'5px'}),
+                        
+                     html.H6(id='loci_title', style={'display':'inline-block'}),
+                      
+                    ], style={'text-align':'center',
+                               'display':'inline-block',
+                               'padding-left':'2%',
+                               'padding=bottom':'2%'}),
+            
+            html.Div([
+                html.Img(id='loci_main', style={'maxWidth':'100%',
+                                                'maxHeight':'80%',
+                                                'display':'inline-block',}),
+            ], style={'text-align':'center'}),
+                        
+            
+                                        
+        ]), # END of LOCI Tab
     
         # %% ### SETUP TAB
         dcc.Tab(id='tabs_setup',
@@ -301,6 +343,7 @@ app.layout = html.Div([
 # This probably uses marginally more processing time, but really simplifies stuff
 #   1. Store selected stack as a dict() in a dcc.Store()
 #   2. MEGA-CALLBACK - which does all the processing
+#   3. Loci-image callback(s) UNRELATED to functioning of the game
 
 ### Setup Stack (Store & Table)
 # Source df of stack from stack2df function using the name from the dropdown
@@ -453,6 +496,38 @@ def mega_callback(n_clicks, n_submit, pType, stack,
     
     return (prob, log, img_src, result_text, soln,
             gif, gif_style, rolling_score, HIDDEN_STR)
+    
+### LOCI Callback(s)
+@app.callback([dd.Output('loci_ref', 'value'),
+               dd.Output('loci_main', 'src'),
+               dd.Output('loci_title', 'children')],
+              [dd.Input('loci_forward', 'n_clicks'),
+               dd.Input('loci_backward', 'n_clicks'),
+               dd.Input('loci_ref', 'n_submit')],
+              [dd.State('loci_ref', 'value')],)
+def loci_callback(fwd, back, n_submit, n):
+
+    # Establish which input caused the trigger
+    changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
+    
+    # Update n
+    if 'loci_forward' in changed_id:
+        n = n + 1
+    elif 'loci_backward' in changed_id:
+        n = n - 1
+        
+    # error checking on n; make sure within the bounds of the memory palace
+    if n <= 1: n = 1
+    elif n >= 52: n = 52
+    
+    # Grab Image Source from loci directory
+    ref = 'loci/'+str(n)+'.jpg'            
+    img_src = app.get_asset_url(ref)
+    
+    # title & text for loci - taken from dictionary
+    title = loci.loc[n, 'title']
+    
+    return n, img_src, [str(title)]
 
 # %% RUN APP
       
