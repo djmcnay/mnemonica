@@ -29,6 +29,7 @@ import dash.dependencies as dd
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_daq as daq
+import dash_bootstrap_components as dbc
 
 # Initialise app object
 # Note that we use an internal CSS stylesheet so no external CSS is added
@@ -125,6 +126,16 @@ app.layout = html.Div([
                               'stack':'tamariz',  # default stack
                               'pTypeRadio':99,    # triggers auto load of problem
                               }),
+    
+    ### MODAL for Popout of Loci (uses dash-bootstrap-components)
+    # Doesn't really impact main running
+    # pretty sure this could be done easily without dbc - maybe look into it
+    dbc.Modal([
+        html.Button('Exit', id='modal_close', className='close-button', style={'display':'inlline', 'text-align':'right'}),
+        html.H3(id='modal_title'),
+        html.Div(id='modal_text'),
+        html.Img(id='modal_img', style={'maxWidth':'100%'}),
+    ], id='modal', className='modal'), # END of Modal component
     
     html.Datalist(id='datalist',
                   children=['Ace of Spades']),
@@ -248,8 +259,8 @@ app.layout = html.Div([
                 children=[
             
             # bar with current loci, forward & backwards
-            html.Div([html.Button(id='loci_backward', children='<', style={'display':'inline-block'}),
-                      html.Button(id='loci_forward', children='>', style={'display':'inline-block'}),
+            html.Div([html.Button(id='loci_backward', children='<<', style={'display':'inline-block'}),
+                      html.Button(id='loci_forward', children='>>', style={'display':'inline-block'}),
                       
                       dcc.Input(id='loci_ref', type='number', value=1, 
                                 min=1, max=52, debounce=True,
@@ -258,7 +269,7 @@ app.layout = html.Div([
                                        'text-align':'left',
                                        'margin-left':'5px',
                                        'margin-right':'5px'}),
-                        
+                     # Loci title          
                      html.H6(id='loci_title', style={'display':'inline-block'}),
                       
                     ], style={'text-align':'center',
@@ -266,11 +277,19 @@ app.layout = html.Div([
                                'padding-left':'2%',
                                'padding=bottom':'2%'}),
             
+            # Loci image in picture
+            # SRC passed through callback
             html.Div([
-                html.Img(id='loci_main', style={'maxWidth':'100%',
-                                                'maxHeight':'80%',
-                                                'display':'inline-block',}),
+                html.Img(id='loci_main',
+                         style={'maxWidth':'100%',
+                                'maxHeight':'350px',
+                                'display':'inline-block',}),
             ], style={'text-align':'center'}),
+                        
+            # Loci description & pop out
+            html.Div([
+                dcc.Markdown(id='loci_text', children='click to enlarge', style={'text-align':'center'}),
+            ]),
                         
             
                                         
@@ -338,11 +357,10 @@ app.layout = html.Div([
     # HIDDEN IN PRODUCTION
     html.Div(id='HIDDEN_DIV', 
              className='markdown-outside-tabs',
-             style={'display':'none', 'font-size':'15px', 'margin-top':'100px'})  
+             style={'display':'none', 'font-size':'15px', 'margin-top':'100px'}),
 
-# end master Layout
 # styling of master-layout done withing 'container' in the CSS file
-], className='container') 
+], className='container')
     
 # %% CALLBACKS
     
@@ -506,6 +524,8 @@ def mega_callback(n_clicks, n_submit, pType, stack,
             gif, gif_style, rolling_score, HIDDEN_STR)
     
 ### LOCI Callback(s)
+# By Loci we specifically refer to the Loci tab
+# Allows the loci image to go forward, backward or to specific loci
 @app.callback([dd.Output('loci_ref', 'value'),
                dd.Output('loci_main', 'src'),
                dd.Output('loci_title', 'children')],
@@ -529,15 +549,55 @@ def loci_callback(fwd, back, n_submit, n):
     elif n >= 52: n = 52
     
     # Grab Image Source from loci directory
-    ref = 'loci/'+str(n)+'.jpg'            
-    img_src = app.get_asset_url(ref)
-    
     # title & text for loci - taken from dictionary
+    ref = 'loci/'+str(n)+'.JPG'            
+    img_src = app.get_asset_url(ref)
     title = loci.loc[n, 'title']
     
     return n, img_src, [str(title)]
 
+### MODAL callback
+# Controls the popout, which shows the Loci (as a clue) or just to see the image
+# Modal is a dash-bootstap-component rather than pure dash, but easy to control
+# complicated bit is only haveing 1 modal for the whole app, thus we need to control
+# which of the various input is asking for the image
+@app.callback([dd.Output('modal', 'is_open'),          # 1 of open; 0 for closed
+               dd.Output('modal_img', 'src'),          # img src for modal
+               dd.Output('modal_title', 'children')],
+              [dd.Input('loci_main', 'n_clicks'),      # img from loci tab
+               dd.Input('image_card', 'n_clicks'),
+               dd.Input('modal_close', 'n_clicks'),],
+              [dd.State('modal', 'is_open'),
+               dd.State('loci_ref', 'value'),
+               dd.State('problem_data', 'data'),       # problem dictionary
+               dd.State('modal_img', 'src'),
+               dd.State('modal_title', 'children')])
+def modalCallback(n1, n2, n3, is_open, loci_ref, prob, img_src, title):
+    
+    # find source of callback, either close modal or determine data required
+    changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
+    
+    # Means we clicked from the Loci tab
+    if 'loci_main' in changed_id:
+        is_open = 1
+        title = loci.loc[loci_ref, 'title']
+        ref = 'loci/'+str(loci_ref)+'.JPG'            
+        img_src = app.get_asset_url(ref)
+    
+    # Means we clicked from the MAIN tab
+    elif 'image_card' in changed_id:
+        is_open = 1
+        n = int(prob['posn'])    # get position fro problem dict
+        title = loci.loc[n, 'title']
+        ref = 'loci/'+str(n)+'.JPG'            
+        img_src = app.get_asset_url(ref)
+        
+    else:
+        is_open = 0    # close modal
+        
+    return is_open, img_src, title
+
 # %% RUN APP
       
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)

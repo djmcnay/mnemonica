@@ -409,6 +409,21 @@ p,
 ul,
 ol {
   margin-bottom: 0.75rem; }
+  
+  
+.close-button {
+  float: right;
+  height: 30px;
+  width: 40px;
+  text-align: center;
+  vertical-align: top;
+  border: 1px solid dimgray;
+  background-color: gray;
+  color: lightgrey;
+  font-size: 10px;
+  margin-top: 5px;
+  margin-right: 5px;
+}
 
 /* Utilities
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
@@ -422,6 +437,28 @@ ol {
   float: right; }
 .u-pull-left {
   float: left; }
+
+
+/* Modals (pop outs)
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+.modal {
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left:0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+  background-color: rgba(245,245,245,0.8); /* cream w/ opacity */
+  margin: 5% auto; /* 15% from the top and centered */
+  border: 1px solid #888;
+  text-align: center;
+  width: 90%; /* Could be more or less, depending on screen size */
+}
 
 
 /* Misc
