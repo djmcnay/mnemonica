@@ -190,7 +190,7 @@ html {
 
 body {
   background-image: url("/assets/images/method_of_loci-1000w.png");
-  background-size: cover;
+  background-size: 100%;
   background-repeat: repeat;
   font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
   line-height: 1.6;

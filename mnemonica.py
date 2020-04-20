@@ -87,31 +87,49 @@ loci = pd.DataFrame(loci['inandout'], columns=['posn', 'title', 'text']).set_ind
 #       img[src*='#center'] {display: block; margin: auto;}
 
 md_about = """
-    The inspiration for this came from [David & Sarah Trustman]
-    (https://www.trustmancreations.com/about-us) and their excellent 
-    book ['The Memory Arts'](https://www.vanishingincmagic.com/magic-books/the-memory-arts-book/). 
+    My inspirations for this are [David & Sarah Trustman] (https://www.trustmancreations.com/about-us) 
+    and their excellent book ['The Memory Arts'](https://www.vanishingincmagic.com/magic-books/the-memory-arts-book/). 
+    I have no affiliation to either the Trustman's or Vanishing Inc. but if you've 
+    stumbled your way here & want an intro to memory then you should watch their 
+    [TEDx](https://www.ted.com/talks/david_and_sarah_trustman_making_memory_more_memorable) 
+    talk & buy their book.
     
     ![The Memory Arts Book](assets/images/the-memory-arts1.jpeg#center)
     
-    The Trustman convention is to place two-cards in each loci, which is great for 
-    memorisation but I found the arithmatic required to go from loci to position number 
-    challenged instant recall.
+    Rather than place 2-cards at each loci, which rapidly sped up my memorisation 
+    I am leaving only 1. The reason is because the small arithmatic required really 
+    reduced my recall times. 
     
-    I would strongly encourage people to build their own 'memory palace' but 
-    I have added images for a memory palace of 51 locations built from the 
-    [In & Out club](https://theinandout.co.uk/). 
-    
-    Instead of each loci showing an 'index' I've grouped loci into groups of 10 
-    and users need to remember which room we are in to remember which group we are in; 
+    I strongly encourage you to your own 'memory palace', not because I don't want 
+    you bimbling around mine, but because the personalisation will make it materially 
+    more memorable - with that said I have provided 51 loci from my memory palace, 
+    which is based on the [Naval & Military club](https://theinandout.co.uk/) in London; 
     excuse the poor photos, I built this during the covid-19 pandemic so only have 
     access to the building via the website virtual tour functions.
     
-    App was developed by the Pontificating Panada using [Dash](https://plot.ly/dash/) 
-    and the source code is available on [GitHub](https://github.com/djmcnay). I don't believe 
-    I've infringed any copyrights, but if you believe I have then please let me know and 
-    I'll take any offending material down."""
-        
-# %% LAYOUT
+    If you are using my memory palace please note that Instead of each loci 
+    showing an 'index' I've grouped loci into groups of 10 & users need to 
+    remember which room we are in to remember which group we are in. 
+    
+    App was developed using [Dash](https://plot.ly/dash/) & the source code is 
+    available on [GitHub](https://github.com/djmcnay). I don't believe I've 
+    infringed any copyrights, but if you believe I have then please let me know 
+    and I'll take any offending material down.
+    
+    This was a hobby project and in the spirit of community I'm making it available 
+    to anyone who can make use of it. That being said, keeping the site alive isn't
+    free so if you've found the app, the memory stuff or the code useful and would 
+    be prepared to [buy me a brew](https://www.buymeacoffee.com/panda) it would be greatly appreciated.
+    
+    [![The Memory Arts Book](https://cdn.buymeacoffee.com/buttons/default-violet.png#center)](https://www.buymeacoffee.com/panda)
+    
+    """
+    
+brew = """
+    [![The Memory Arts Book](https://cdn.buymeacoffee.com/buttons/default-violet.png#center)](https://www.buymeacoffee.com/panda)    
+    """
+    
+    # %% LAYOUT
 
 app.layout = html.Div([
     
