@@ -36,6 +36,34 @@ app = dash.Dash('Mnemonica')
 app.title='Mnemonica'
 server = app.server
     
+# GIF Image direectory
+# Imported as a JSON file (look at the jsoning.py file)
+gifs = json.load(open('assets/json_gifs', 'r'))
+gif_wins, gif_loss = [], []
+
+
+gif_wins.extend([i['link'] for i in gifs['boobs']]+[i['link'] for i in gifs['strong']])
+gif_loss.extend([i['link'] for i  in gifs['lose']])
+
+# because I'm an overgrown child, lets add some random hashtags to the gifs
+def giphy(hashtag=['boobs', 'sexy'], limit=25, rating=""):
+    
+    data_list = []
+    
+    for h in hashtag:
+        querystring = {"limit":limit, "q":h, "rating":rating, "api_key":"A9mWPStSmNIqnZQ8QHLLnPj9wR6ioi6u"}    
+        response = requests.request("GET", url="https://giphy.p.rapidapi.com/v1/gifs/search",
+                                    headers={'x-rapidapi-host':"giphy.p.rapidapi.com",
+                                             'x-rapidapi-key':"acc33661bemshee9e80b6508b83bp17261ejsn2ce1309f0c17"},
+                                    params=querystring)        
+        data_list.extend(json.loads(response.text)['data'])
+    
+    return ['https://media.giphy.com/media/'+i['id']+'/giphy.gif' for i in data_list]
+
+# extend with popular hastags
+gif_wins.extend(giphy(['sexy', 'amazing', 'epic', 'win', 'knockout', 'champion']))
+gif_loss.extend(giphy(['fail', 'slap']))
+
 # Dictionaries
 # Really just to assist in converting shorthand i.e. AS to Ace of Spades
 suits = {'C':'Clubs', 'H':'Hearts', 'D':'Diamonds', 'S':'Spades'}
@@ -47,56 +75,10 @@ values = {'2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, '10':10,
 stacks = json.load(open('assets/json_stacks', 'r'))
 tamariz= pd.DataFrame(stacks['tamariz'], columns=['posn','card','loci','image'])
 
-# %% Silly GIFs
+### Dictionary of Loci
+loci = json.load(open('assets/json_loci', 'r'))
+loci = pd.DataFrame(loci['inandout'], columns=['posn', 'title', 'text']).set_index('posn')
 
-# dummy list of URLs
-gif_wins, gif_loss = [], []
-
-# Giphy search (via RestAPI)
-# because I'm an overgrown child, lets add some random hashtags to the gifs
-def giphy(hashtag=['boobs', 'sexy'], limit=25, rating="", data_list=[]):
-    # for full function look at my giphy script
-    # rapidAPI also very useful - https://rapidapi.com/giphy/api/giphy
-    
-    # NB/ API KEY is specific to mnemonica App
-    api_key= "A9mWPStSmNIqnZQ8QHLLnPj9wR6ioi6u"
-    
-    for h in hashtag:
-        querystring= {"limit":limit, "q":h, "rating":rating, "api_key":api_key}   
-        try:
-            response= requests.request("GET", params=querystring, 
-                                       url="https://giphy.p.rapidapi.com/v1/gifs/search",
-                                       headers={'x-rapidapi-host':"giphy.p.rapidapi.com",
-                                                'x-rapidapi-key':"acc33661bemshee9e80b6508b83bp17261ejsn2ce1309f0c17"},)        
-            data_list.extend(json.loads(response.text)['data'])
-        except:
-            continue
-    
-    # note on return we need the ID code in this format NOT the embed link
-    return ['https://media.giphy.com/media/'+i['id']+'/giphy.gif' for i in data_list]
-
-# personal directory imported as a JSON file (look at the jsoning.py file)
-gifs = json.load(open('assets/json_gifs', 'r'))
-gif_wins.extend([i['link'] for i in gifs['boobs']]+[i['link'] for i in gifs['strong']])
-gif_loss.extend([i['link'] for i  in gifs['lose']])
-
-# extend with popular hastags
-gif_wins.extend(giphy(['sexy',
-                       'amazing',
-                       'epic',
-                       'win',
-                       'knockout',
-                       'champion',
-                       'strong',
-                       'lingerie',
-                       'boom',
-                       'flex',
-                       'red panda']))
-    
-gif_loss.extend(giphy(['fail',
-                       'slap',
-                       'no']))
-    
 # %% MARKDOWN BLOCKS
 
 # Note we use a hack with CSS to centralise the image!
@@ -110,9 +92,18 @@ md_about = """
     
     ![The Memory Arts Book](assets/images/the-memory-arts1.jpeg#center)
     
-    The Trustman's convention is to place two-cards in each location, which is something 
-    I have followed in my own memory-palace. In the future I hope to add sketches of my 
-    each room in my memory palace... or maybe the world doesn't need that.
+    The Trustman convention is to place two-cards in each loci, which is great for 
+    memorisation but I found the arithmatic required to go from loci to position number 
+    challenged instant recall.
+    
+    I would strongly encourage people to build their own 'memory palace' but 
+    I have added images for a memory palace of 51 locations built from the 
+    [In & Out club](https://theinandout.co.uk/). 
+    
+    Instead of each loci showing an 'index' I've grouped loci into groups of 10 
+    and users need to remember which room we are in to remember which group we are in; 
+    excuse the poor photos, I built this during the covid-19 pandemic so only have 
+    access to the building via the website virtual tour functions.
     
     App was developed by the Pontificating Panada using [Dash](https://plot.ly/dash/) 
     and the source code is available on [GitHub](https://github.com/djmcnay). I don't believe 
@@ -185,6 +176,7 @@ app.layout = html.Div([
                           'padding-top':'10px',
                           'padding-bottom':'10px',
                           'display':'inline-block',
+                          #'border':'1px solid blue',
                             }),
                 
                 ## PROBLEM DIV
@@ -195,6 +187,7 @@ app.layout = html.Div([
                           'height':'325px',
                           'text-align':'center',
                           'display':'inline-block',
+                          #'border':'1px solid green',
                             }),  # END of Problem Div
                         
                 ## RESULTS
@@ -211,6 +204,7 @@ app.layout = html.Div([
                     html.Img(id='image_result', src='',),
                     
                 ], style={'text-align':'center',
+                          #'border':'1px solid pink',
                           'display':'block'}),    # END Results Div
     
             ], className='tab-div-custom', ), # END of MAIN Div
@@ -244,6 +238,43 @@ app.layout = html.Div([
                 ),
             ], className='tab-div-custom',),
         ]), # END of STACK tab
+                        
+        # %% ### Loci Tabl
+        
+        dcc.Tab(id='loci',
+                label='LOCI',
+                className='custom-tab',
+                selected_className='custom-tab--selected',
+                children=[
+            
+            # bar with current loci, forward & backwards
+            html.Div([html.Button(id='loci_backward', children='<', style={'display':'inline-block'}),
+                      html.Button(id='loci_forward', children='>', style={'display':'inline-block'}),
+                      
+                      dcc.Input(id='loci_ref', type='number', value=1, 
+                                min=1, max=52, debounce=True,
+                                style={'width':'55px',
+                                       'display':'inline-block',
+                                       'text-align':'left',
+                                       'margin-left':'5px',
+                                       'margin-right':'5px'}),
+                        
+                     html.H6(id='loci_title', style={'display':'inline-block'}),
+                      
+                    ], style={'text-align':'center',
+                               'display':'inline-block',
+                               'padding-left':'2%',
+                               'padding=bottom':'2%'}),
+            
+            html.Div([
+                html.Img(id='loci_main', style={'maxWidth':'100%',
+                                                'maxHeight':'80%',
+                                                'display':'inline-block',}),
+            ], style={'text-align':'center'}),
+                        
+            
+                                        
+        ]), # END of LOCI Tab
     
         # %% ### SETUP TAB
         dcc.Tab(id='tabs_setup',
@@ -307,8 +338,7 @@ app.layout = html.Div([
     # HIDDEN IN PRODUCTION
     html.Div(id='HIDDEN_DIV', 
              className='markdown-outside-tabs',
-             style={'display':'none',   #'border':'1px solid blue',
-                    'font-size':'15px', 'margin-top':'100px'})  
+             style={'display':'none', 'font-size':'15px', 'margin-top':'100px'})  
 
 # end master Layout
 # styling of master-layout done withing 'container' in the CSS file
@@ -321,6 +351,7 @@ app.layout = html.Div([
 # This probably uses marginally more processing time, but really simplifies stuff
 #   1. Store selected stack as a dict() in a dcc.Store()
 #   2. MEGA-CALLBACK - which does all the processing
+#   3. Loci-image callback(s) UNRELATED to functioning of the game
 
 ### Setup Stack (Store & Table)
 # Source df of stack from stack2df function using the name from the dropdown
@@ -473,8 +504,40 @@ def mega_callback(n_clicks, n_submit, pType, stack,
     
     return (prob, log, img_src, result_text, soln,
             gif, gif_style, rolling_score, HIDDEN_STR)
+    
+### LOCI Callback(s)
+@app.callback([dd.Output('loci_ref', 'value'),
+               dd.Output('loci_main', 'src'),
+               dd.Output('loci_title', 'children')],
+              [dd.Input('loci_forward', 'n_clicks'),
+               dd.Input('loci_backward', 'n_clicks'),
+               dd.Input('loci_ref', 'n_submit')],
+              [dd.State('loci_ref', 'value')],)
+def loci_callback(fwd, back, n_submit, n):
+
+    # Establish which input caused the trigger
+    changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
+    
+    # Update n
+    if 'loci_forward' in changed_id:
+        n = n + 1
+    elif 'loci_backward' in changed_id:
+        n = n - 1
+        
+    # error checking on n; make sure within the bounds of the memory palace
+    if n <= 1: n = 1
+    elif n >= 52: n = 52
+    
+    # Grab Image Source from loci directory
+    ref = 'loci/'+str(n)+'.jpg'            
+    img_src = app.get_asset_url(ref)
+    
+    # title & text for loci - taken from dictionary
+    title = loci.loc[n, 'title']
+    
+    return n, img_src, [str(title)]
 
 # %% RUN APP
       
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=False)

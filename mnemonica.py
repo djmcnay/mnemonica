@@ -92,10 +92,18 @@ md_about = """
     
     ![The Memory Arts Book](assets/images/the-memory-arts1.jpeg#center)
     
-    The Trustman's convention is to place two-cards in each location, which I found 
-    to be the simplest method of memorising the order of a deck, allowing interaction 
-    between cards at each loci. However, from my experience the downside is the 
-    requirement to do maths when converting loci to position numbers.
+    The Trustman convention is to place two-cards in each loci, which is great for 
+    memorisation but I found the arithmatic required to go from loci to position number 
+    challenged instant recall.
+    
+    I would strongly encourage people to build their own 'memory palace' but 
+    I have added images for a memory palace of 51 locations built from the 
+    [In & Out club](https://theinandout.co.uk/). 
+    
+    Instead of each loci showing an 'index' I've grouped loci into groups of 10 
+    and users need to remember which room we are in to remember which group we are in; 
+    excuse the poor photos, I built this during the covid-19 pandemic so only have 
+    access to the building via the website virtual tour functions.
     
     App was developed by the Pontificating Panada using [Dash](https://plot.ly/dash/) 
     and the source code is available on [GitHub](https://github.com/djmcnay). I don't believe 
@@ -532,4 +540,4 @@ def loci_callback(fwd, back, n_submit, n):
 # %% RUN APP
       
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
